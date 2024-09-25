@@ -23,24 +23,26 @@ public class AutenticacionServiceImpl implements AutenticacionService {
         String[] datosUsuario = null;
         Resource resource = resourceLoader.getResource("classpath:usuarios.txt");
 
-        try(BufferedReader br = new BufferedReader(new FileReader(resource.getFile()))){
+        try (BufferedReader br = new BufferedReader(new FileReader(resource.getFile()))) {
 
             String linea;
-            while ((linea = br.readLine()) != null){
+            while ((linea = br.readLine()) != null) {
 
                 String[] datos = linea.split(";");
                 if (loginRequestDTO.tipoDocumento().equals(datos[0]) &&
-                loginRequestDTO.numeroDocumento().equals(datos[1]) &&
-                loginRequestDTO.password().equals(datos[2])){
+                        loginRequestDTO.numeroDocumento().equals(datos[1]) &&
+                        loginRequestDTO.password().equals(datos[2])) {
 
                     datosUsuario = new String[2];
-                    datosUsuario[0] = datos[3]; //Recuperar nombre
-                    datosUsuario[1] = datos[4]; //Recuperar correo
+                    datosUsuario[0] = datos[3]; // Recuperar nombre
+                    datosUsuario[1] = datos[4]; // Recuperar correo
                     break;
+
                 }
+
             }
 
-        } catch (IOException  e){
+        } catch (IOException e) {
 
             datosUsuario = null;
             throw new IOException(e);
@@ -49,4 +51,5 @@ public class AutenticacionServiceImpl implements AutenticacionService {
 
         return datosUsuario;
     }
+
 }
