@@ -24,7 +24,7 @@ public class AutenticacionController {
     public LoginResponseDTO login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
         try {
-            Thread.sleep(Duration.ofSeconds(60));
+            Thread.sleep(Duration.ofSeconds(5));
             String[] datosUsuario = autenticacionService.validarUsuario(loginRequestDTO);
             System.out.println("Resultado: " + Arrays.toString(datosUsuario));
             if (datosUsuario == null) {
