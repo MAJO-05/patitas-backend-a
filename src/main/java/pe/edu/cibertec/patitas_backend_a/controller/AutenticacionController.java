@@ -3,6 +3,7 @@ package pe.edu.cibertec.patitas_backend_a.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
+import pe.edu.cibertec.patitas_backend_a.client.AutenticacionClient;
 import pe.edu.cibertec.patitas_backend_a.dto.LoginRequestDTO;
 import pe.edu.cibertec.patitas_backend_a.dto.LoginResponseDTO;
 import pe.edu.cibertec.patitas_backend_a.service.AutenticacionService;
@@ -15,11 +16,14 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/autenticacion")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:8082")
 public class AutenticacionController {
 
     @Autowired
     AutenticacionService autenticacionService;
+
+    @Autowired
+    private AutenticacionClient autenticacionClient;
 
     private String obtenerTipoDocumento(String tipoDocumento) {
         switch (tipoDocumento) {
@@ -39,7 +43,7 @@ public class AutenticacionController {
     public LoginResponseDTO login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
         try {
-            Thread.sleep(Duration.ofSeconds(10));
+            Thread.sleep(Duration.ofSeconds(9));
             String[] datosUsuario = autenticacionService.validarUsuario(loginRequestDTO);
             System.out.println("Resultado: " + Arrays.toString(datosUsuario));
             if (datosUsuario == null) {
@@ -52,6 +56,31 @@ public class AutenticacionController {
         }
 
     }
+
+    @PostMapping("/autenticar-feign")
+    public LoginResponseDTO autenticarFeign(@RequestBody LoginRequestDTO loginRequestDTO) {
+        System.out.println("Iniciando autenticación con Feign Client...");
+
+        try {
+            LoginResponseDTO response = autenticacionClient.login(loginRequestDTO);
+            System.out.println("Respuesta del cliente Feign: " + response);
+
+            if ("00".equals(response.codigo())) {
+                return new LoginResponseDTO("00", "", response.nombreUsuario(), response.correoUsuario());
+            } else {
+                return new LoginResponseDTO("02", "Error: Autenticación fallida", "", "");
+            }
+        } catch (Exception e) {
+            System.err.println("Error en la autenticación: " + e.getMessage()); // Log de error
+            return new LoginResponseDTO("99", "Error: Ocurrió un problema en la autenticación", "", "");
+        }
+    }
+
+
+
+
+
+
     @PostMapping("/logout")
     public String logout(@RequestBody LoginRequestDTO logoutRequestDTO) {
         String tipoDocumentoTexto = obtenerTipoDocumento(logoutRequestDTO.tipoDocumento());
