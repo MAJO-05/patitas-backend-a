@@ -12,4 +12,3 @@ public interface AutenticacionClient {
     @PostMapping("/login")
     LoginResponseDTO login(@RequestBody LoginRequestDTO loginRequestDTO);
 }
-
